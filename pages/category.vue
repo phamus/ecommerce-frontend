@@ -23,12 +23,23 @@
               <span class="a-button-register">
                 <span class="a-button-inner">
                   <span class="a-button-text" @click="onSubmit"
-                    >Add Product</span
+                    >Add Category</span
                   >
                 </span>
               </span>
             </div>
           </form>
+
+          <hr />
+          <ul class="list-group-item">
+            <li
+              v-for="category in categories"
+              :key="category._id"
+              style="border-bottom:1px solid #0000001a; padding-bottom:20px;padding-top:8px"
+            >
+              {{ category.type }}
+            </li>
+          </ul>
         </div>
       </div>
       <div class="col-sm-3"></div>
@@ -37,6 +48,11 @@
 </template>
 <script>
 export default {
+  async asyncData({ $axios }) {
+    let categories = await $axios.$get("http://localhost:5000/api/category");
+
+    return categories;
+  },
   data() {
     return {
       type: ""
@@ -44,11 +60,17 @@ export default {
   },
   methods: {
     async onSubmit() {
-      let result = await this.$axios.$post(
-        "http://localhost:5000/api/catgory",
-        { type: this.type }
-      );
-      this.$router.push("/");
+      try {
+        const data = { type: this.type };
+        let result = await this.$axios.$post(
+          "http://localhost:5000/api/category",
+          data
+        );
+
+        this.categories.push(data);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 };
